@@ -18,7 +18,7 @@ Getting credit card approval is quite a headache for many people, especially for
 
 #### Mission:
 
-The user can provide his/her personal information like age, gender, number of years of credit history, annual income and so on and the app will automatically calculate the approval probaility for a "general credit card", which is in contrast with those fancy cards like Platinum Card of American Express which is beyond the scope of use of the app's targeted users.
+The user can provide his/her personal information like age, gender, number of years of credit history, annual income and so on and the app will automatically calculate the approval probaility for a "general credit card", which is in contrast with those fancy cards like Platinum Card of American Express which is beyond the scope of use of the app's targeted users. The training data for this project comes primarily on a Kaggle dataset.
 
 Theoretical example： A student who just recevied his SSN and no credit history wondered whether he could be approved for Chase's Freedom student credit card. Therefore, he logged in this APP and typed in his personal information and got the result that he might be disapproved this time. However, he still wanted to see whether he could be approved. He then applied through the chase website and got rejected. His credit score also decreased due to this rejectiion. He now regretted his reckless act and decided to trust this app the next time.
 
