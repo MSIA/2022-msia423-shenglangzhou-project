@@ -1,4 +1,4 @@
-# MSiA423 Template Repository
+# MSiA423 Shenglang-Zhou Credit Card Approval Prediction Project
 
 # Table of Contents
 * [Directory structure ](#Directory-structure)
