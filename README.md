@@ -31,7 +31,7 @@ The model will be deployed if it can predict the approvals in the test set with 
 
 ##### Business Achievements
 
-To determine the business success of my app among users, standard A/B testing will be used to compare the average approval rate of the applicants who did not consult the app to the average approval rate of the applicants who consulted my app about whether they are pre-approved for the credit card. If it shows significant results in improving the approval rates then this app is definitely worth deploying.
+To determine the business success of my app among users, standard A/B testing will be used to compare the average approval rate of the applicants who did not consult the app to the average approval rate of the applicants who consulted my app to see whether they are pre-approved for the credit card. If it shows significant results in improving the approval rates then this app is definitely worth deploying.
 
 Overall, a successful deployment of this app will help applicants maintain their credit scores by reducing the number of unsuccessful applications.
 
