@@ -1,6 +1,7 @@
 # MSiA423 Shenglang-Zhou Credit Card Approval Prediction Project
 
 # Table of Contents
+* [Project Charter] (## Project Charter)
 * [Directory structure ](#Directory-structure)
 * [Running the app ](#Running-the-app)
 	* [1. Initialize the database ](#1.-Initialize-the-database)
