@@ -1,8 +1,0 @@
-export MYSQL_USER="dylan"
-export MYSQL_PASSWORD="Zz990915"
-export MYSQL_HOST="nu-msia423-shenglang.c32qnaesjuwf.us-east-1.rds.amazonaws.com"
-export MYSQL_PORT="3306"
-export DATABASE_NAME="msia_db"
-export SQLALCHEMY_DATABASE_URI="mysql+pymysql://dylan:Zz990915@nu-msia423-shenglang.c32qnaesjuwf.us-east-1.rds.amazonaws.com:3306/msia_db"
-export AWS_ACCESS_KEY_ID=AKIARKX4T5LKEFUT25D4
-export AWS_SECRET_ACCESS_KEY="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"
