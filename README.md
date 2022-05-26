@@ -33,8 +33,7 @@ Theoretical example： A student who just recevied his SSN and no credit history
 The model will be deployed if it can predict the approvals in the test set with a cross validation predicted accuracy of 0.7. Also, we need to have reasonable recall, precision and F1 score to validate the result. These metrics will be continuously updated with the users who consult the app.
 
 ##### Business Achievements
-
-To determine the business success of my app among users, standard A/B testing will be used to compare the average approval rate of the applicants who did not consult the app to the average approval rate of the applicants who consulted my app to see whether they are pre-approved for the credit card. If it shows significant results in improving the approval rates then this app is definitely worth deploying.
+We will collect the user feedback from our users to gain our predicted accuracy. If the actual accuracy is above 0.7 then we will deploy it.
 
 Overall, a successful deployment of this app will help applicants maintain their credit scores by reducing the number of unsuccessful applications.
 
