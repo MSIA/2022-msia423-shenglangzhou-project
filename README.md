@@ -17,7 +17,7 @@
 
 Getting credit card approval is quite a headache for many people, especially for people who do not have a long and valid credit history. What's even worse is that everytime a person received a rejection for a credit card application, it will exert negative impact on the credit score of that person, making the next application harder to approve. To help increase the chance of the approval rate and avoid potential negative impact of unsuccessful application, this app helps those applicants pre-determine whether it is worthwhile to give it a shot.
 
-Thw dataset comes from Kaggle: https://www.kaggle.com/datasets/rikdifos/credit-card-approval-prediction
+The dataset comes from Kaggle: https://www.kaggle.com/datasets/rikdifos/credit-card-approval-prediction
 
 
 #### Mission:
