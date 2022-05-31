@@ -20,7 +20,7 @@ Base = declarative_base()
 
 
 class Application(Base):
-    """Creates a data model for the database to be set up for capturing songs."""
+    """Creates a data model for the database to be set up for capturing past applications."""
 
     __tablename__ = "application_details"
 
@@ -46,11 +46,16 @@ class Application(Base):
    
 
 class Credit(Base):
-
+    """Creates a data model for the database to be set up for capturing past applicants credit record."""
     __tablename__ = 'credit_record'
     ID = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True)
     MONTHS_BALANCE= sqlalchemy.Column(sqlalchemy.String(100), primary_key=True) 
     STATUS= sqlalchemy.Column(sqlalchemy.String(100), unique=False, nullable=True) 
+
+class New_applications(Base):
+    """Creates a data model for the database to be set up for capturing new applications."""
+    __tablename__ = 'new_application'
+    
 
   
 
