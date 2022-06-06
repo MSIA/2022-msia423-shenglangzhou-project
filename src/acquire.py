@@ -5,13 +5,14 @@ importing and cleaning functionality
 import logging
 
 import pandas as pd
+import typing
 
 logger = logging.getLogger(__name__)
 
 pd.options.mode.chained_assignment = None
 
 
-def import_application_data(path):
+def import_application_data(path:str)->pd.DataFrame:
     """Read data from "path" into a DataFrame and change column names to lower case
 
     Args:
@@ -30,11 +31,10 @@ def import_application_data(path):
     
     return data
 
-def import_credit_data(path):
-    """Read data from "path" into a DataFrame and change column names to lower case
-
+def import_credit_data(path:str)->pd.DataFrame:
+    """Read data from "path" into a DataFrame
     Args:
-        path (str): file name path; default value is 'data/sample/application_data.csv'
+        path (str): file name path; default value is 'data/sample/application_records.csv'
             (specified in config.yaml)
 
 
@@ -50,11 +50,11 @@ def import_credit_data(path):
     return data
 
 
-def filna(df, col, val):
+def filna(df:pd.DataFrame, col:str, val:str)->pd.DataFrame:
     """Fill the specified column's missing values with specified value
 
     Args:
-        df (:obj:`DataFrame <pandas.DataFrame>`): a DataFrame of loan records
+        df (:obj:`DataFrame <pandas.DataFrame>`): a DataFrame of application records
         col (str): a column in the DataFrame that needs to fill its missing values with 0
 
     Returns:
@@ -71,7 +71,7 @@ def filna(df, col, val):
     return df
 
 
-def clean_column(df, col, replace_dict):
+def clean_column(df:pd.DataFrame, col:str, replace_dict:typing.Dict[str,str])->pd.DataFrame:
     """Clean the specified column in the DataFrame with less categories
 
     Args:
@@ -94,7 +94,7 @@ def clean_column(df, col, replace_dict):
     return df
 
 
-def to_str(df, col):
+def to_str(df:pd.DataFrame, col:str)->pd.DataFrame:
     """Change values in a certain column to string type
 
     Args:
@@ -112,7 +112,7 @@ def to_str(df, col):
     return df
 
 
-def neg_to_pos(df, cols):
+def neg_to_pos(df:pd.DataFrame, cols:typing.List[str])->pd.DataFrame:
     """Change signs of specified columns from negative to positive
 
     Args:
@@ -133,7 +133,7 @@ def neg_to_pos(df, cols):
     return df
 
 
-def replace_cat(df, cat_dict):
+def replace_cat(df:pd.DataFrame, cat_dict:typing.List[str])->pd.DataFrame:
     """Replace binary categorical columns by more informative
         binary values to match future user input
 
@@ -158,7 +158,18 @@ def replace_cat(df, cat_dict):
 
     return df
 
-def clean_target(df,convert_dict, convert_col,key,val1,val2,val3,new_col):
+def clean_target(df:pd.DataFrame,convert_dict:typing.Dict[str,str], convert_col: str,key: str,val1: str,val2: str,val3: str,new_col: str)->pd.DataFrame:
+    '''Generating the target variable from credit records.
+    Args:
+        df (:obj:`DataFrame <pandas.DataFrame>`): DataFrame with original records.
+        convert_dict (dict): Dictionary containing information on transforming credit records.
+        convert_col (str) : Column that needs to be converted
+        key (str): Unique identifier of a row
+
+    Returns:
+        df (:obj:`DataFrame <pandas.DataFrame>`): DataFrame with newly created target variable.
+
+    '''
     df.replace({convert_col: convert_dict}, inplace=True)
     df=df.value_counts(subset=[key, convert_col]).unstack(fill_value=0)
     df.loc[(df[val1] > df[val2]), new_col] = 1
@@ -173,7 +184,7 @@ def clean_target(df,convert_dict, convert_col,key,val1,val2,val3,new_col):
 
 
 
-def clean(df, filna_col, clean_col, clean_replace_dict, to_str_list, neg_cols, cat_dict, filna_dict):
+def clean(df: pd.DataFrame, filna_col: str, clean_col: str, clean_replace_dict: typing.Dict[str,str], to_str_list: typing.List[str], neg_cols: typing.List[str], cat_dict: typing.Dict[str,str], filna_dict: typing.Dict[str,str])->pd.DataFrame:
     """Clean the input DataFrame to be ready to generate new features from
 
     Args:
@@ -189,7 +200,7 @@ def clean(df, filna_col, clean_col, clean_replace_dict, to_str_list, neg_cols, c
             default is 'phone_contactable'(config.yaml)
         neg_cols (:obj: `list`): list of columns that needs to turn their values
             from negative to positive to make more sense;
-            default is ['days_birth', 'days_employed', 'days_id_change'] (config.yaml)
+            default is ['days_birth', 'days_employed'] (config.yaml)
         cat_dict (dict of dict): dictionary of dictionary where the outer key
             is the column name in the DataFrame, inner keys are the original
             binary categories (e.g. 'Y' & 'N') and the inner values are
@@ -218,7 +229,16 @@ def clean(df, filna_col, clean_col, clean_replace_dict, to_str_list, neg_cols, c
 
     return df_out
 
-def get_full_df(df1,df2,key):
+def get_full_df(df1:pd.DataFrame,df2:pd.DataFrame,key:str)->pd.DataFrame:
+    '''Merging the two dataframe into final cleaned Dataframe
+    Args:
+        df1 (:obj:`DataFrame <pandas.DataFrame>`): DataFrame with original records.
+        df2 (:obj:`DataFrame <pandas.DataFrame>`): DataFrame with original records.
+        key (str): Column that we join the two DataFrames by.
+    Returns:
+        df_out (:obj:`DataFrame <pandas.DataFrame>`):
+    '''
+
     df_out = df1.merge(df2, how='inner', on=[key])
     return df_out
 

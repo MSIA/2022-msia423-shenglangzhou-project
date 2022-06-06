@@ -7,11 +7,12 @@ import logging
 import joblib
 import pandas as pd
 import numpy as np
+import typing
 
 logger = logging.getLogger(__name__)
 
 
-def transform_input(ui_dict, cat_cols, ohe_cols):
+def transform_input(ui_dict: typing.Dict[str,str], cat_cols:typing.List[str], ohe_cols:typing.List[str])-> pd.DataFrame:
     """Transform the user input from the app to get predictions using the trained model
 
     Args:
@@ -46,8 +47,8 @@ def transform_input(ui_dict, cat_cols, ohe_cols):
     return input_new
 
 
-def get_prediction(input_ohe, model_path, ohe_cols):
-    """Get loan delinquency prediction for new user input
+def get_prediction(input_ohe:pd.DataFrame, model_path:str, ohe_cols:typing.List[str]):
+    """Get credit card approval prediction for new user input
 
     Args:
         input_ohe (:obj:`DataFrame <pandas.DataFrame>`): a DataFrame of the transformed user input
@@ -57,7 +58,7 @@ def get_prediction(input_ohe, model_path, ohe_cols):
 
     Returns:
         [pred_prob, pred_bin] (:obj:`list`): the first object in the list is
-            the predicted probability of loan delinquency where the second object
+            the predicted probability of credit card approval where the second object
             in the list is the predicted class for the applicant
 
     """
@@ -71,7 +72,7 @@ def get_prediction(input_ohe, model_path, ohe_cols):
     pred_prob = np.round(100 * loaded_rf.predict_proba(input_ohe[ohe_cols])[:, 1][0], 2)
     # predict the class with the new user input
     if loaded_rf.predict(input_ohe[ohe_cols]) == 1:
-        pred_bin = "the applicant IS LIKELY to have delinquent payment"
+        pred_bin = "Congratulations! the applicant IS LIKELY to be approved for the Credit Card!!!"
     else:
-        pred_bin = "the applicant IS NOT LIKELY to have delinquent payment"
+        pred_bin = "Unfortunately, the applicant IS NOT LIKELY to be approved for the Credit Card!!!"
     return [pred_prob, pred_bin]

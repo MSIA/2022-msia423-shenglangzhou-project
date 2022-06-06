@@ -6,13 +6,14 @@ import logging
 
 import pandas as pd
 import numpy as np
+import typing
 
 logger = logging.getLogger(__name__)
 
 pd.options.mode.chained_assignment = None
 
 
-def day_to_year(df, new_cols_dict):
+def day_to_year(df:pd.DataFrame, new_cols_dict:typing.List[str])->pd.DataFrame:
     """Generate features from specified columns where the
         units of calculation was in 'days' to count in 'years'
 
@@ -33,7 +34,7 @@ def day_to_year(df, new_cols_dict):
     return df
 
 
-def create_new_col(df, old_col, new_col):
+def create_new_col(df:pd.DataFrame, old_col:str, new_col:str)->pd.DataFrame:
     """Generate a new column based on an original column in the DataFrame
 
     Args:
@@ -50,7 +51,7 @@ def create_new_col(df, old_col, new_col):
     return df
 
 
-def featurize(df, dty_cols_dict, old_col, new_col):
+def featurize(df:pd.DataFrame, dty_cols_dict:typing.Dict[str,str], old_col:str, new_col:str)->pd.DataFrame:
     """Generate new features with the given DataFrame
 
     Args:
@@ -74,8 +75,19 @@ def featurize(df, dty_cols_dict, old_col, new_col):
     logger.info('Feature engineering completed')
     return df_featurized
 
+def get_user_df(df:pd.DataFrame, cat_vars:typing.List[str], num_vars:typing.List[str])->pd.DataFrame:
+    '''Get data that could be ingested into RDS
+    Args:
+        df (:obj:`DataFrame <pandas.DataFrame>`): Original DataFrame
+        cat_vars (List): List of categorical variables
+        num_vars (List): List of Numerical variables
+    Returns:
+        df_vars (:obj:`DataFrame <pandas.DataFrame>`): Resulting DataFrame
+    '''
+    df_vars = df[num_vars + cat_vars]
+    return df_vars
 
-def get_ohe_data(df, cat_vars, num_vars, target_col):
+def get_ohe_data(df:pd.DataFrame, cat_vars:typing.List[str], num_vars:typing.List[str], target_col:str)->pd.DataFrame:
     """One Hot Encode categorical variables in a DataFrame to prepare for modeling
 
     Args:
