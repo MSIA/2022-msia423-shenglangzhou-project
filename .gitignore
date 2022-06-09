@@ -8,8 +8,8 @@ __pycache__/
 .ipynb_checkpoints/
 
 .aws_config
+data/**/*.csv
 
-data/*
 !data/sample/
 !data/external/
 config/local/*
