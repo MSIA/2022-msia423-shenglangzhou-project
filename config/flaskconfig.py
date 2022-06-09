@@ -3,7 +3,7 @@ from xmlrpc.client import Boolean
 
 DEBUG = True
 LOGGING_CONFIG = "config/logging/local.conf"
-PORT = 5004
+PORT = 5000
 APP_NAME = "credit_card_application"
 SQLALCHEMY_Application_MODIFICATIONS = True
 HOST = "0.0.0.0"
