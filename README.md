@@ -93,22 +93,22 @@ Overall, a successful deployment of this app will help applicants maintain their
 To build the image, run from this directory (the root of the repo): 
 
 ```bash
- docker build -f dockerfiles/Dockerfile.run -t pennylanedb .
+make image_model
 ```
 #### Create the database 
 To create the database in the location configured in `config.py` run: 
 
 ```bash
-docker run --mount type=bind,source="$(pwd)"/data,target=/app/data/ pennylanedb create_db  --engine_string=sqlite:///data/tracks.db
+make create_db
 ```
 The `--mount` argument allows the app to access your local `data/` folder and save the SQLite database there so it is available after the Docker container finishes.
 
 
-#### Adding songs 
-To add songs to the database:
+#### ingest data
+To add data to the database:
 
 ```bash
-docker run --mount type=bind,source="$(pwd)"/data,target=/app/data/ pennylanedb ingest --engine_string=sqlite:///data/tracks.db --artist=Emancipator --title="Minor Cause" --album="Dusk to Dawn"
+make ingest_data
 ```
 
 #### Defining your engine string 
@@ -117,21 +117,11 @@ A SQLAlchemy database connection is defined by a string with the following forma
 `dialect+driver://username:password@host:port/database`
 
 The `+dialect` is optional and if not provided, a default is used. For a more detailed description of what `dialect` and `driver` are and how a connection is made, you can see the documentation [here](https://docs.sqlalchemy.org/en/13/core/engines.html). We will cover SQLAlchemy and connection strings in the SQLAlchemy lab session on 
-##### Local SQLite database 
-
-A local SQLite database can be created for development and local testing. It does not require a username or password and replaces the host and port with the path to the database file: 
-
-```python
-engine_string='sqlite:///data/tracks.db'
-
+##### Running Model pipeline
+To run the entire model pipeline
+```bash
+make all
 ```
-
-The three `///` denote that it is a relative path to where the code is being run (which is from the root of this directory).
-
-You can also define the absolute path with four `////`, for example:
-
-```python
-engine_string = 'sqlite://///Users/cmawer/Repos/2022-msia423-template-repository/data/tracks.db'
 ```
 
 
@@ -158,7 +148,7 @@ MAX_ROWS_SHOW = 100 # Limits the number of rows returned from the database
 To build the image, run from this directory (the root of the repo): 
 
 ```bash
- docker build -f dockerfiles/Dockerfile.app -t pennylaneapp .
+make image_app
 ```
 
 This command builds the Docker image, with the tag `pennylaneapp`, based on the instructions in `dockerfiles/Dockerfile.app` and the files existing in this directory.
@@ -168,7 +158,7 @@ This command builds the Docker image, with the tag `pennylaneapp`, based on the 
 To run the Flask app, run: 
 
 ```bash
- docker run --name test-app --mount type=bind,source="$(pwd)"/data,target=/app/data/ -p 5000:5000 pennylaneapp
+make app
 ```
 You should be able to access the app at http://127.0.0.1:5000/ in your browser (Mac/Linux should also be able to access the app at http://127.0.0.1:5000/ or localhost:5000/) .
 
@@ -186,9 +176,9 @@ Note: If `PORT` in `config/flaskconfig.py` is changed, this port should be chang
 Once finished with the app, you will need to kill the container. If you named the container, you can execute the following: 
 
 ```bash
-docker kill test-app 
+docker kill final-project-app
 ```
-where `test-app` is the name given in the `docker run` command.
+where `final-project-app` is the name given in the `docker run` command.
 
 If you did not name the container, you can look up its name by running the following:
 
@@ -203,13 +193,13 @@ The name will be provided in the right most column.
 Run the following:
 
 ```bash
- docker build -f dockerfiles/Dockerfile.test -t pennylanetest .
+make image_test
 ```
 
 To run the tests, run: 
 
 ```bash
- docker run pennylanetest
+make unit_test
 ```
 
 The following command will be executed within the container to run the provided unit tests under `test/`:  
@@ -218,51 +208,3 @@ The following command will be executed within the container to run the provided 
 python -m pytest
 ``` 
 
-## Mypy
-
-Run the following:
-
-```bash
- docker build -f dockerfiles/Dockerfile.mypy -t pennymypy .
-```
-
-To run mypy over all files in the repo, run: 
-
-```bash
- docker run pennymypy .
-```
-To allow for quick iteration, mount your entire repo so changes in Python files are detected:
-
-
-```bash
- docker run --mount type=bind,source="$(pwd)"/,target=/app/ pennymypy .
-```
-
-To run mypy for a single file, run: 
-
-```bash
- docker run pennymypy run.py
-```
-
-## Pylint
-
-Run the following:
-
-```bash
- docker build -f dockerfiles/Dockerfile.pylint -t pennylint .
-```
-
-To run pylint for a file, run:
-
-```bash
- docker run pennylint run.py 
-```
-
-(or any other file name, with its path relative to where you are executing the command from)
-
-To allow for quick iteration, mount your entire repo so changes in Python files are detected:
-
-
-```bash
- docker run --mount type=bind,source="$(pwd)"/,target=/app/ pennylint run.py
-```
