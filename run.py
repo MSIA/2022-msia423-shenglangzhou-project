@@ -20,11 +20,11 @@ from src.features import featurize, get_ohe_data, get_user_df
 from src.model import train_model
 from src.score_model import compute_score
 from src.evaluate import load_pred, load_test, compute_metrics
-from config.flaskconfig import SQLALCHEMY_DATABASE_URI
+from config.flaskconfig import SQLALCHEMY_DATABASE_URI, S3_BUCKET
 
 logging.config.fileConfig(pkg_resources.resource_filename(__name__, 'config/logging/local.conf'),
                           disable_existing_loggers=False)
-logger = logging.getLogger('loan-application-pipeline')
+logger = logging.getLogger('credit-card-application-pipeline')
 
 if __name__ == '__main__':
 
@@ -41,12 +41,12 @@ if __name__ == '__main__':
     # Sub-parser for uploading data to s3
     sb_upload = subparsers.add_parser('upload_file_to_s3', help='Upload raw data to s3')
     sb_upload.add_argument('--s3_path1',
-                           default='s3://2022-msia423-shenglang-zhou/raw/application_record.csv',
+                           default=str(S3_BUCKET)+'/raw/application_record.csv',
                            help='S3 data path to the data')
     sb_upload.add_argument('--local_path1', default='data/sample/application_record.csv',
                            help='local path to the data')
     sb_upload.add_argument('--s3_path2',
-                           default='s3://2022-msia423-shenglang-zhou/raw/credit_record.csv',
+                           default=str(S3_BUCKET)+'/raw/credit_record.csv',
                            help='S3 data path to the data')
     sb_upload.add_argument('--local_path2', default='data/sample/credit_record.csv',
                            help='local path to the data')
@@ -54,13 +54,13 @@ if __name__ == '__main__':
     # Sub-parser for downloading data from s3
     sb_download = subparsers.add_parser('download_file_from_s3', help='Download raw data from s3')
     sb_download.add_argument('--s3_path1',
-                           default='s3://2022-msia423-shenglang-zhou/raw/application_record.csv',
+                           default=str(S3_BUCKET)+'/raw/application_record.csv',
                            help='S3 data path to the data')
     sb_download.add_argument('--local_path1', 
                             default='data/sample/application_record.csv',
                             help='local path to the data')
     sb_download.add_argument('--s3_path2',
-                           default='s3://2022-msia423-shenglang-zhou/raw/credit_record.csv',
+                           default=str(S3_BUCKET)+'/raw/credit_record.csv',
                            help='S3 data path to the data')
     sb_download.add_argument('--local_path2', default='data/sample/credit_record.csv',
                            help='local path to the data')

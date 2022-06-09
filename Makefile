@@ -1,4 +1,4 @@
-.PHONY: image_model image_app image_test all
+.PHONY: image_model image_app image_test all 
 
 clean:
 	rm -rf data/artifacts/*
@@ -16,10 +16,10 @@ image_test:
 .PHONY: upload_file_to_s3 download_file_from_s3
 
 upload_file_to_s3:
-	docker run --mount type=bind,source="$(shell pwd)",target=/app/ -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY final-project run.py upload_file_to_s3
+	docker run --mount type=bind,source="$(shell pwd)",target=/app/ -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e S3_BUCKET final-project run.py upload_file_to_s3
 
 download_file_from_s3:
-	docker run --mount type=bind,source="$(shell pwd)",target=/app/ -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY final-project run.py download_file_from_s3
+	docker run --mount type=bind,source="$(shell pwd)",target=/app/ -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e S3_BUCKET final-project run.py download_file_from_s3
 
 .PHONY: create_db 
 
@@ -31,7 +31,8 @@ create_db:
 .PHONY: raw cleaned featurized model ingest_data prediction metrics
 
 
-data/artifacts/cleaned.csv: download_file_from_s3
+data/artifacts/cleaned.csv: 
+	docker run --mount type=bind,source="$(shell pwd)",target=/app/ -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e S3_BUCKET final-project run.py download_file_from_s3
 	docker run --mount type=bind,source="$(shell pwd)",target=/app/ final-project run.py run_model_pipeline --step clean --config=config/config.yaml --output=data/artifacts/cleaned.csv
 
 cleaned: data/artifacts/cleaned.csv
@@ -42,7 +43,7 @@ data/artifacts/featurized.csv: data/artifacts/cleaned.csv
 featurized: data/artifacts/featurized.csv
 
 ingest_data:
-	docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e SQLALCHEMY_DATABASE_URI final-project run.py ingest --input=data/sample/ingest_data.csv
+	docker run -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e SQLALCHEMY_DATABASE_URI final-project run.py ingest --input=data/artifacts/ingest_data.csv
 
 models/randomforest.joblib: data/artifacts/featurized.csv
 	docker run --mount type=bind,source="$(shell pwd)",target=/app/ final-project run.py run_model_pipeline --step model --input=data/artifacts/featurized.csv --config=config/config.yaml --output=models/randomforest.joblib
@@ -72,4 +73,4 @@ unit_test:
 app:
 	docker run --mount type=bind,source="$(shell pwd)",target=/app/ -e SQLALCHEMY_DATABASE_URI -p 5000:5000 final-project-app
 
-all: download_file_from_s3 cleaned featurized model prediction metrics
+all: cleaned featurized model prediction metrics

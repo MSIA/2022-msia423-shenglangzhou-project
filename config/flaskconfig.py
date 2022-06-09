@@ -18,6 +18,7 @@ DB_PW = os.environ.get('MYSQL_PASSWORD')
 DATABASE = os.environ.get('DATABASE_NAME')
 DB_DIALECT = 'mysql+pymysql'
 SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
+S3_BUCKET = os.environ.get('S3_BUCKET')
 if SQLALCHEMY_DATABASE_URI is not None:
     pass
 elif DB_HOST is None:

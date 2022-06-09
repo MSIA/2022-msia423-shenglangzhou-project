@@ -1,0 +1,83 @@
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+      h1 {
+        text-align: center;
+        color: #424242;
+      }
+      h3 {
+        text-align: center;
+        color: #424242;
+      }
+      h4 {
+        text-align: center;
+        color: #424242;
+      }
+      p {
+        text-align: justify;
+        text-justify: inter-word;
+        color: #424242;
+      }
+      div {text-align: center}
+      body {
+        background-color: #F2F2F2
+      }
+      a {
+        text-align: center;
+      }
+    </style>
+
+    <link href="static/basic.css" rel="stylesheet">
+
+    <title>About This Credit Card Application</title>
+  </head>
+  <body>
+    <h1>Want to know whether you will be approved for your credit card?</h1>
+    <h3>Project Developer: Shenglang Zhou</h3>
+
+    <br/>
+    <img src="https://pbs.twimg.com/media/EDETD1EXoAAcb0l?format=jpg&name=medium" alt="Image" width="1130", height="550", align="justify"></img>
+
+    <h4>VISION</h4>
+
+    <p>
+
+      Getting credit card approval is quite a headache for many people, especially for people who do not have a long and valid credit history. What's even worse is that everytime a person received a rejection for a credit card application, it will exert negative impact on the credit score of that person, making the next application harder to approve. To help increase the chance of the approval rate and avoid potential negative impact of unsuccessful application, this app helps those applicants pre-determine whether it is worthwhile to give it a shot.
+
+      The dataset comes from Kaggle: https://www.kaggle.com/datasets/rikdifos/credit-card-approval-prediction
+
+    </p>
+
+    <h4>MISSION</h4>
+
+    <p>
+      The user can provide his/her personal information like age, gender, number of years of credit history, annual income and so on and the app will automatically calculate the approval probaility for a "general credit card", which is in contrast with those fancy cards like Platinum Card of American Express which is beyond the scope of use of the app's targeted users. The training data for this project comes primarily on a Kaggle dataset.
+
+      Theoretical example： A student who just recevied his SSN and no credit history wondered whether he could be approved for Chase's Freedom student credit card. Therefore, he logged in this APP and typed in his personal information and got the result that he might be disapproved this time. However, he still wanted to see whether he could be approved. He then applied through the chase website and got rejected. His credit score also decreased due to this rejectiion. He now regretted his reckless act and decided to trust this app the next time.
+    </p>
+
+    <h4>CONTACT</h4>
+
+    <div>
+      <a href="mailto:shenglangzhou2022@u.northwestern.edu"><img src="https://static.thenounproject.com/png/1287389-200.png" alt="Image" width="60", height="60"></img></a>
+      <a href="https://www.linkedin.com/in/shenglang-dylan-zhou/"><img src="https://icons-for-free.com/iconfiles/png/512/in+linked+in+logo+linkedin+button+social+media+icon-1320190506816052194.png" alt="Image" width="60", height="60"></img></a>
+    </div>
+    <br/>
+
+    <div>
+      <a href="{{ url_for('index') }}">Return to the Main Menu to Get Predictions</a>
+    </div>
+    <br/>
+
+    <!-- Style for the landing page: Bootstrap Bundle with Popper -->
+    <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
+            crossorigin="anonymous"
+    ></script>
+
+  </body>
+</html>
