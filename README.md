@@ -4,12 +4,11 @@
 * [Project Charter](#Project-Charter)
 * [Directory structure ](#Directory-structure)
 * [Running the app ](#Running-the-app)
-	* [1. Initialize the database ](#1.-Initialize-the-database)
+	* [1. Initialize the database and run model pipeline](#1.-Initialize-the-database)
 	* [2. Configure Flask app ](#2.-Configure-Flask-app)
 	* [3. Run the Flask app ](#3.-Run-the-Flask-app)
 * [Testing](#Testing)
-* [Mypy](#Mypy)
-* [Pylint](#Pylint)
+
 
 ## Project Charter
 
@@ -95,7 +94,7 @@ To build the image, run from this directory (the root of the repo):
 ```bash
 make image_model
 ```
-#### Create the database 
+#### Create the database and run model pipeline 
 To create the database in the location configured in `config.py` run: 
 
 ```bash
