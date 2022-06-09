@@ -3,39 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <link href="static/basic.css" rel="stylesheet">
+
+    <style>
+      h1 {
+        text-align: center;
+        color: #424242;
+      }
+      h3 {
+        text-align: center;
+        color: #424242;
+      }
+      h4 {
+        color: #424242;
+      }
+
+      label {
+        text-align: justify;
+        text-justify: inter-word;
+        color: #424242;
+      }
+      input {
+        text-align: justify;
+        text-justify: inter-word;
+        color: #424242;
+      }
+      div {
+        text-align: center;
+      }
+      body {
+        background-color: #F2F2F2
+      }
+
+    </style>
+
+    <title>Main Menu for Loan Application</title>
+
 </head>
 
 <body>
+    <h1>
+         Identifying Good Candidates for Credit Card Application
+    </h1>
+
     <h3>
-         <a href = "{{ url_for('index') }}">Penny Lane Music Recommender</a>
+        Predict Whether the Applicant Will Be Approved for Credit Card
     </h3>
 
-    <hr/>
-    <table>
-         <thead>
-            <tr>
-               <th>Title</th>
-               <th>Artist</th>
-               <th>Album</th>
-            </tr>
-         </thead>
+    <div>
+        <a href="{{ url_for('about') }}">Read More About This Credit Card Application</a>
+    </div>
+    <br/>
 
-         <tbody>
-            {% for track in tracks %}
-               <tr>
-                   <td>{{ track.title }}</td>
-                   <td>{{ track.artist }}</td>
-                   <td>{{ track.album }}</td>
-               </tr>
-            {% endfor %}
-         </tbody>
-      </table>
+    <img src="https://www.cardrates.com/images/uploads/2019/09/Increase-Credit-Approval-Odds-Feat.jpg?width=830&height=432" alt="Image" width="1130", height="600", align="justify"></img>
+
+    <h4>
+        Please enter the Credit Card applicant information below to GET PREDICTION RESULTS:
+    </h4>
+
       <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
       <dl>
-        <input type=text size=15 name=title placeholder="Title">
-        <input type=text size=15 name=artist placeholder="Artist">
-        <input type=text size=15 name=album placeholder="Album">
-        <input type=submit value=Add>
+
+          <label>1. Gender: </label>
+          {% for gender in genders %}
+          <input type="radio" id="{{ gender }}" name="gender" value="{{ gender }}"/>
+          <label for="{{ gender }}">{{ gender }}</label>
+          {% endfor %}
+        <br />
+
+        <br />
+        <label>2. Does the applicant own any cars? </label>
+        {% for car in own_car %}
+        <input type="radio" id="{{ car }}" name="own_car" value="{{ car }}"/>
+        <label for="{{ car }}">{{ car }}</label>
+        {% endfor %}
+        <br />
+
+        <br /> 
+          <label for="age">3. How old is the applicant:</label>
+          <input type="number" id="years_birth" name="years_birth">
+        <br />
+
+       
+
+        <br />
+          <label>4. Does the applicant own any realty? </label>
+          {% for realty in own_realty %}
+          <input type="radio" id="{{ realty }}" name="own_realty" value="{{ realty }}"/>
+          <label for="{{ realty }}">{{ realty }}</label>
+          {% endfor %}
+        <br />
+
+        <br />
+          <label for="num_children">5. Number of children:</label>
+          <input type="number" id="num_children" name="num_children" min="0">
+        <br />
+
+        <br />
+          <label for="income_total">6. Total income per year ($):</label>
+          <input type="number" id="income_total" name="income_total" min="0">
+        <br />
+
+
+        <br />
+          <label for="income_type">7. Applicant's income type: </label>
+          <select name="income_type" id="income_type">
+              {% for income in income_type %}
+              <option value="{{ income }}">{{ income }}</option>
+              {% endfor %}
+          </select>
+        <br />
+
+        <br />
+          <label for="edu_type">8. Applicant's highest level of education: </label>
+          <select name="edu_type" id="edu_type">
+              {% for edu in edu_type %}
+              <option value="{{ edu }}">{{ edu }}</option>
+              {% endfor %}
+          </select>
+        <br />
+
+        <br />
+          <label for="fam_status">9. Applicant's family status: </label>
+          <select name="family_status" id="fam_status">
+              {% for fam in fam_status %}
+              <option value="{{ fam }}">{{ fam }}</option>
+              {% endfor %}
+          </select>
+        <br />
+
+        <br />
+        <label for="housing_type">10. Applicant's housing tyoe: </label>
+        <select name="housing_type" id="housing_type">
+            {% for house in housing_type %}
+            <option value="{{ house }}">{{ house }}</option>
+            {% endfor %}
+        </select>
+      <br />
+
+        <br />
+          <label for="years_employed">11. Number of years before the application, the person started current employment:</label>
+          <input type="number" id="years_employed" name="years_employed">
+        <br />
+
+
+
+        <br />
+          <label>12. Does the applicant own a phone?</label>
+          {% for phone in own_phone %}
+          <input type="radio" id="{{ phone }}" name="own_phone" value="{{ phone }}"/>
+          <label for="{{ phone }}">{{ phone }}</label>
+          {% endfor %}
+        <br />
+
+        <br />
+        <label>13. Does the applicant own a work phone?</label>
+        {% for phone in own_work_phone %}
+        <input type="radio" id="{{ phone }}" name="own_work_phone" value="{{ phone }}"/>
+        <label for="{{ phone }}">{{ phone }}</label>
+        {% endfor %}
+        <br />
+
+        <br />
+        <label>14. Does the applicant provide an email?</label>
+        {% for email in own_email %}
+        <input type="radio" id="{{ email }}" name="own_email" value="{{ email }}"/>
+        <label for="{{ email }}">{{ email }}</label>
+        {% endfor %}
+        <br />
+
+        <br />
+        <label>15. Does the applicant own a mobil phone?</label>
+        {% for mobil in own_mobil %}
+        <input type="radio" id="{{ mobil }}" name="own_mobil" value="{{ mobil}}"/>
+        <label for="{{ mobil }}">{{ mobil}}</label>
+        {% endfor %}
+        <br />
+
+        <br />
+        <label for="edu_type">16. Applicant's type of occupation: </label>
+        <select name="occupation_type" id="occupation_type">
+            {% for job in occupation_type %}
+            <option value="{{ job }}">{{ job }}</option>
+            {% endfor %}
+        </select>
+        <br />
+
+        <br />
+          <label for="num_family_members">17. How many family members does the applicant have? </label>
+          <input type="number" id="num_family_members" name="cnt_family_members" min="0">
+        <br />
+
+        <br />
+        <label>18. Is the applicant employed?</label>
+        {% for status in employed %}
+        <input type="radio" id="{{ status }}" name="employed" value="{{ status}}"/>
+        <label for="{{ status}}">{{ status}}</label>
+        {% endfor %}
+        <br />
+        
+
+ 
+ 
+
+        <br />
+
+        <input type=submit value="Save Applicant Information & Get Prediction!">
+
       </dl>
     </form>
 

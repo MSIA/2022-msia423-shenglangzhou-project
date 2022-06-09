@@ -1,0 +1,231 @@
+acquire:
+  import_application_data:
+    path: data/sample/application_record.csv
+  import_credit_data:
+    path: data/sample/credit_record.csv
+  
+  
+  clean_target: 
+    convert_dict: 
+      'C' : 'Good_Debt'
+      'X' : 'Good_Debt'
+      '0' : 'Good_Debt'
+      '1' : 'Neutral_Debt'
+      '2' : 'Neutral_Debt'
+      '3' : 'Bad_Debt'
+      '4' : 'Bad_Debt'
+      '5' : 'Bad_Debt'
+    convert_col: 'STATUS'
+    key: 'ID'
+    val1: 'Good_Debt'
+    val2: 'Neutral_Debt'
+    val3: 'Bad_Debt'
+    new_col: 'CREDIT_APPROVAL_STATUS'
+   
+  clean:
+    filna_col: OCCUPATION_TYPE
+    filna_dict:
+      'OCCUPATION_TYPE' : 'Not Specified'
+    clean_col: NAME_EDUCATION_TYPE
+    clean_replace_dict:
+      'Secondary / secondary special': 'Secondary education'
+      'Lower secondary': 'Secondary education'
+      'Academic degree': 'Higher education'
+    to_str_list: ['FLAG_MOBIL','FLAG_WORK_PHONE','FLAG_PHONE','FLAG_EMAIL']
+    neg_cols:
+      - DAYS_BIRTH
+      - DAYS_EMPLOYED
+    cat_dict:
+      'FLAG_OWN_CAR': {"Y": "Yes", "N": "No"}
+      'FLAG_OWN_REALTY': {"Y": "Yes", "N": "No"}
+      'FLAG_MOBIL': {"1": "Yes", "0": "No"}
+      'FLAG_WORK_PHONE': {"1": "Yes", "0": "No"}
+      'FLAG_PHONE': {"1": "Yes", "0": "No"}
+      'FLAG_EMAIL': {"1": "Yes", "0": "No"}
+      'CODE_GENDER': {"M": "Male", "F": "Female"}
+  get_full_df:
+    key: 'ID'
+
+
+features:
+  featurize:
+    dty_cols_dict:
+      'AGE': 'DAYS_BIRTH'
+      'YEARS_EMPLOYED': 'DAYS_EMPLOYED'
+    old_col: DAYS_EMPLOYED
+    new_col: EMPLOYED
+  get_user_df:
+    cat_vars:
+      - FLAG_OWN_CAR
+      - FLAG_OWN_REALTY
+      - FLAG_MOBIL
+      - FLAG_PHONE
+      - FLAG_EMAIL
+      - CODE_GENDER
+      - FLAG_WORK_PHONE
+      - NAME_INCOME_TYPE
+      - EMPLOYED
+      - NAME_EDUCATION_TYPE
+      - NAME_FAMILY_STATUS
+      - NAME_HOUSING_TYPE
+      - OCCUPATION_TYPE
+    num_vars:
+      - ID
+      - CNT_CHILDREN
+      - AMT_INCOME_TOTAL
+      - AGE
+      - YEARS_EMPLOYED
+      - CNT_FAM_MEMBERS
+  get_ohe_data:
+    cat_vars:
+      - FLAG_OWN_CAR
+      - FLAG_OWN_REALTY
+      - FLAG_MOBIL
+      - FLAG_PHONE
+      - FLAG_EMAIL
+      - CODE_GENDER
+      - FLAG_WORK_PHONE
+      - NAME_INCOME_TYPE
+      - EMPLOYED
+      - NAME_EDUCATION_TYPE
+      - NAME_FAMILY_STATUS
+      - NAME_HOUSING_TYPE
+      - OCCUPATION_TYPE
+    num_vars:
+      - CNT_CHILDREN
+      - AMT_INCOME_TOTAL
+      - AGE
+      - YEARS_EMPLOYED
+      - CNT_FAM_MEMBERS
+    target_col: CREDIT_APPROVAL_STATUS
+model:
+  train_model:
+    target_colname: CREDIT_APPROVAL_STATUS
+    sample_strat: 0.5
+    ts: 0.4
+    n_estimat: 10
+    max_dep: 10
+    rand_state: 0
+score_model:
+  compute_score:
+    target_colname: CREDIT_APPROVAL_STATUS
+    proba_col: "proba"
+    bin_col: "bin"
+evaluate:
+    load_test:
+        y_col: "CREDIT_APPROVAL_STATUS"
+    load_pred:
+        proba_col: "proba"
+        bin_col: "bin"
+    compute_metrics:
+        metrics: ["auc", "confusion", "accuracy", "classification_report"]
+predict:
+  transform_input:
+    cat_cols:
+      - FLAG_OWN_CAR
+      - FLAG_OWN_REALTY
+      - FLAG_MOBIL
+      - FLAG_PHONE
+      - FLAG_EMAIL
+      - CODE_GENDER
+      - FLAG_WORK_PHONE
+      - NAME_INCOME_TYPE
+      - EMPLOYED
+      - NAME_EDUCATION_TYPE
+      - NAME_FAMILY_STATUS
+      - NAME_HOUSING_TYPE
+      - OCCUPATION_TYPE
+    ohe_cols:
+      - CNT_CHILDREN
+      - AMT_INCOME_TOTAL
+      - AGE
+      - YEARS_EMPLOYED
+      - CNT_FAM_MEMBERS
+      - FLAG_OWN_CAR_Yes
+      - FLAG_OWN_REALTY_Yes
+      - FLAG_PHONE_Yes
+      - FLAG_EMAIL_Yes
+      - CODE_GENDER_Male 
+      - FLAG_WORK_PHONE_Yes
+      - NAME_INCOME_TYPE_Pensioner
+      - NAME_INCOME_TYPE_State servant
+      - NAME_INCOME_TYPE_Student
+      - NAME_INCOME_TYPE_Working
+      - EMPLOYED_Yes
+      - NAME_EDUCATION_TYPE_Incomplete higher
+      - NAME_EDUCATION_TYPE_Secondary education
+      - NAME_FAMILY_STATUS_Married
+      - NAME_FAMILY_STATUS_Separated
+      - NAME_FAMILY_STATUS_Single / not married
+      - NAME_FAMILY_STATUS_Widow
+      - NAME_HOUSING_TYPE_House / apartment
+      - NAME_HOUSING_TYPE_Municipal apartment
+      - NAME_HOUSING_TYPE_Office apartment
+      - NAME_HOUSING_TYPE_Rented apartment
+      - NAME_HOUSING_TYPE_With parents
+      - OCCUPATION_TYPE_Cleaning staff
+      - OCCUPATION_TYPE_Cooking staff
+      - OCCUPATION_TYPE_Core staff
+      - OCCUPATION_TYPE_Drivers
+      - OCCUPATION_TYPE_HR staff
+      - OCCUPATION_TYPE_High skill tech staff
+      - OCCUPATION_TYPE_IT staff
+      - OCCUPATION_TYPE_Laborers
+      - OCCUPATION_TYPE_Low-skill Laborers
+      - OCCUPATION_TYPE_Managers
+      - OCCUPATION_TYPE_Medicine staff
+      - OCCUPATION_TYPE_Not Specified
+      - OCCUPATION_TYPE_Private service staff
+      - OCCUPATION_TYPE_Realty agents
+      - OCCUPATION_TYPE_Sales staff
+      - OCCUPATION_TYPE_Secretaries
+      - OCCUPATION_TYPE_Security staff
+      - OCCUPATION_TYPE_Waiters/barmen staff
+  get_prediction:
+     model_path: models/randomforest.joblib
+     ohe_cols:
+      - CNT_CHILDREN
+      - AMT_INCOME_TOTAL
+      - AGE
+      - YEARS_EMPLOYED
+      - CNT_FAM_MEMBERS
+      - FLAG_OWN_CAR_Yes
+      - FLAG_OWN_REALTY_Yes
+      - FLAG_PHONE_Yes
+      - FLAG_EMAIL_Yes
+      - CODE_GENDER_Male 
+      - FLAG_WORK_PHONE_Yes
+      - NAME_INCOME_TYPE_Pensioner
+      - NAME_INCOME_TYPE_State servant
+      - NAME_INCOME_TYPE_Student
+      - NAME_INCOME_TYPE_Working
+      - EMPLOYED_Yes
+      - NAME_EDUCATION_TYPE_Incomplete higher
+      - NAME_EDUCATION_TYPE_Secondary education
+      - NAME_FAMILY_STATUS_Married
+      - NAME_FAMILY_STATUS_Separated
+      - NAME_FAMILY_STATUS_Single / not married
+      - NAME_FAMILY_STATUS_Widow
+      - NAME_HOUSING_TYPE_House / apartment
+      - NAME_HOUSING_TYPE_Municipal apartment
+      - NAME_HOUSING_TYPE_Office apartment
+      - NAME_HOUSING_TYPE_Rented apartment
+      - NAME_HOUSING_TYPE_With parents
+      - OCCUPATION_TYPE_Cleaning staff
+      - OCCUPATION_TYPE_Cooking staff
+      - OCCUPATION_TYPE_Core staff
+      - OCCUPATION_TYPE_Drivers
+      - OCCUPATION_TYPE_HR staff
+      - OCCUPATION_TYPE_High skill tech staff
+      - OCCUPATION_TYPE_IT staff
+      - OCCUPATION_TYPE_Laborers
+      - OCCUPATION_TYPE_Low-skill Laborers
+      - OCCUPATION_TYPE_Managers
+      - OCCUPATION_TYPE_Medicine staff
+      - OCCUPATION_TYPE_Not Specified
+      - OCCUPATION_TYPE_Private service staff
+      - OCCUPATION_TYPE_Realty agents
+      - OCCUPATION_TYPE_Sales staff
+      - OCCUPATION_TYPE_Secretaries
+      - OCCUPATION_TYPE_Security staff
+      - OCCUPATION_TYPE_Waiters/barmen staff

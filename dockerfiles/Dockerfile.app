@@ -1,8 +1,10 @@
-FROM python:3.9-slim-buster
+FROM ubuntu:20.04
 
-COPY ./requirements.txt /app/requirements.txt
+RUN apt-get update -y && apt-get install -y python3-pip python3-dev git gcc dos2unix g++
 
 WORKDIR /app
+
+COPY ./requirements.txt /app/requirements.txt
 
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
@@ -11,4 +13,4 @@ COPY . /app
 
 EXPOSE 5000
 
-CMD ["python3", "app.py"]
+ENTRYPOINT ["python3","app.py"]
