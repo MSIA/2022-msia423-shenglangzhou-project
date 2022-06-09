@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 pd.options.mode.chained_assignment = None
 
 
-def day_to_year(df:pd.DataFrame, new_cols_dict:typing.List[str])->pd.DataFrame:
+def day_to_year(df: pd.DataFrame, new_cols_dict: typing.List[str]) -> pd.DataFrame:
     """Generate features from specified columns where the
         units of calculation was in 'days' to count in 'years'
 
@@ -29,12 +29,12 @@ def day_to_year(df:pd.DataFrame, new_cols_dict:typing.List[str])->pd.DataFrame:
 
     """
     for key, value in new_cols_dict.items():
-        df.loc[:, key] = df[value].apply(lambda x: np.round(x/365))
-        logger.info('New column %s created based on original column %s', key, value)
+        df.loc[:, key] = df[value].apply(lambda x: np.round(x / 365))
+        logger.info("New column %s created based on original column %s", key, value)
     return df
 
 
-def create_new_col(df:pd.DataFrame, old_col:str, new_col:str)->pd.DataFrame:
+def create_new_col(df: pd.DataFrame, old_col: str, new_col: str) -> pd.DataFrame:
     """Generate a new column based on an original column in the DataFrame
 
     Args:
@@ -46,12 +46,14 @@ def create_new_col(df:pd.DataFrame, old_col:str, new_col:str)->pd.DataFrame:
         df (:obj:`DataFrame <pandas.DataFrame>`): a resulting DataFrame with the new column created
 
     """
-    df.loc[:, new_col] = ['Yes' if i >= 0 else 'No' for i in df[old_col]]
-    logger.info('New column %s created based on original column %s', new_col, old_col)
+    df.loc[:, new_col] = ["Yes" if i >= 0 else "No" for i in df[old_col]]
+    logger.info("New column %s created based on original column %s", new_col, old_col)
     return df
 
 
-def featurize(df:pd.DataFrame, dty_cols_dict:typing.Dict[str,str], old_col:str, new_col:str)->pd.DataFrame:
+def featurize(
+    df: pd.DataFrame, dty_cols_dict: typing.Dict[str, str], old_col: str, new_col: str
+) -> pd.DataFrame:
     """Generate new features with the given DataFrame
 
     Args:
@@ -72,22 +74,31 @@ def featurize(df:pd.DataFrame, dty_cols_dict:typing.Dict[str,str], old_col:str, 
     """
     df_new = day_to_year(df, dty_cols_dict)
     df_featurized = create_new_col(df_new, old_col, new_col)
-    logger.info('Feature engineering completed')
+    logger.info("Feature engineering completed")
     return df_featurized
 
-def get_user_df(df:pd.DataFrame, cat_vars:typing.List[str], num_vars:typing.List[str])->pd.DataFrame:
-    '''Get data that could be ingested into RDS
+
+def get_user_df(
+    df: pd.DataFrame, cat_vars: typing.List[str], num_vars: typing.List[str]
+) -> pd.DataFrame:
+    """Get data that could be ingested into RDS
     Args:
         df (:obj:`DataFrame <pandas.DataFrame>`): Original DataFrame
         cat_vars (List): List of categorical variables
         num_vars (List): List of Numerical variables
     Returns:
         df_vars (:obj:`DataFrame <pandas.DataFrame>`): Resulting DataFrame
-    '''
+    """
     df_vars = df[num_vars + cat_vars]
     return df_vars
 
-def get_ohe_data(df:pd.DataFrame, cat_vars:typing.List[str], num_vars:typing.List[str], target_col:str)->pd.DataFrame:
+
+def get_ohe_data(
+    df: pd.DataFrame,
+    cat_vars: typing.List[str],
+    num_vars: typing.List[str],
+    target_col: str,
+) -> pd.DataFrame:
     """One Hot Encode categorical variables in a DataFrame to prepare for modeling
 
     Args:
@@ -104,15 +115,14 @@ def get_ohe_data(df:pd.DataFrame, cat_vars:typing.List[str], num_vars:typing.Lis
         df_ohe (:obj:`DataFrame <pandas.DataFrame>`): a resulting one-hot-encoded DataFrame
 
     """
-    df_vars = df[num_vars + cat_vars+ [target_col]]
-    logger.info('There are %i NUMERICAL variables/features selected', len(num_vars))
-    logger.info('There are %i CATEGORICAL variables/features selected', len(cat_vars))
-
+    df_vars = df[num_vars + cat_vars + [target_col]]
+    logger.info("There are %i NUMERICAL variables/features selected", len(num_vars))
+    logger.info("There are %i CATEGORICAL variables/features selected", len(cat_vars))
 
     # create dummies, drop 1 column from each dummy group
     cat_dc = pd.get_dummies(df_vars[cat_vars], drop_first=True)
 
     # Concatenate encoded columns to numerical columns
-    data_ohe = pd.concat([df_vars[num_vars+[target_col]], cat_dc], axis=1)
+    data_ohe = pd.concat([df_vars[num_vars + [target_col]], cat_dc], axis=1)
 
     return data_ohe

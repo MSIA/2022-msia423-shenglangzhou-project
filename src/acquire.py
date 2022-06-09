@@ -3,16 +3,17 @@ This module contains multiple functions that offers
 importing and cleaning functionality
 """
 import logging
+import typing
 
 import pandas as pd
-import typing
+
 
 logger = logging.getLogger(__name__)
 
 pd.options.mode.chained_assignment = None
 
 
-def import_application_data(path:str)->pd.DataFrame:
+def import_application_data(path: str) -> pd.DataFrame:
     """Read data from "path" into a DataFrame and change column names to lower case
 
     Args:
@@ -25,13 +26,13 @@ def import_application_data(path:str)->pd.DataFrame:
 
     """
     data = pd.read_csv(path)
-    logger.info('Data loaded from path: %s', path)
+    logger.info("Data loaded from path: %s", path)
     logger.info("The shape of the DataFrame loaded is: %s", data.shape)
 
-    
     return data
 
-def import_credit_data(path:str)->pd.DataFrame:
+
+def import_credit_data(path: str) -> pd.DataFrame:
     """Read data from "path" into a DataFrame
     Args:
         path (str): file name path; default value is 'data/sample/application_records.csv'
@@ -43,14 +44,13 @@ def import_credit_data(path:str)->pd.DataFrame:
 
     """
     data = pd.read_csv(path)
-    logger.info('Data loaded from path: %s', path)
+    logger.info("Data loaded from path: %s", path)
     logger.info("The shape of the DataFrame loaded is: %s", data.shape)
 
-    
     return data
 
 
-def filna(df:pd.DataFrame, col:str, val:str)->pd.DataFrame:
+def filna(df: pd.DataFrame, col: str, val: str) -> pd.DataFrame:
     """Fill the specified column's missing values with specified value
 
     Args:
@@ -66,12 +66,12 @@ def filna(df:pd.DataFrame, col:str, val:str)->pd.DataFrame:
 
     df.loc[:, col] = df[col].fillna(val)
 
-  
-
     return df
 
 
-def clean_column(df:pd.DataFrame, col:str, replace_dict:typing.Dict[str,str])->pd.DataFrame:
+def clean_column(
+    df: pd.DataFrame, col: str, replace_dict: typing.Dict[str, str]
+) -> pd.DataFrame:
     """Clean the specified column in the DataFrame with less categories
 
     Args:
@@ -94,7 +94,7 @@ def clean_column(df:pd.DataFrame, col:str, replace_dict:typing.Dict[str,str])->p
     return df
 
 
-def to_str(df:pd.DataFrame, col:str)->pd.DataFrame:
+def to_str(df: pd.DataFrame, col: str) -> pd.DataFrame:
     """Change values in a certain column to string type
 
     Args:
@@ -112,7 +112,7 @@ def to_str(df:pd.DataFrame, col:str)->pd.DataFrame:
     return df
 
 
-def neg_to_pos(df:pd.DataFrame, cols:typing.List[str])->pd.DataFrame:
+def neg_to_pos(df: pd.DataFrame, cols: typing.List[str]) -> pd.DataFrame:
     """Change signs of specified columns from negative to positive
 
     Args:
@@ -127,13 +127,16 @@ def neg_to_pos(df:pd.DataFrame, cols:typing.List[str])->pd.DataFrame:
 
     """
     for col in cols:
-        df.loc[:, col] = df[col].apply(lambda x: x*-1)
-        logger.info("The values in column %s was changed from "
-                    "negative values to positive values", col)
+        df.loc[:, col] = df[col].apply(lambda x: x * -1)
+        logger.info(
+            "The values in column %s was changed from "
+            "negative values to positive values",
+            col,
+        )
     return df
 
 
-def replace_cat(df:pd.DataFrame, cat_dict:typing.List[str])->pd.DataFrame:
+def replace_cat(df: pd.DataFrame, cat_dict: typing.List[str]) -> pd.DataFrame:
     """Replace binary categorical columns by more informative
         binary values to match future user input
 
@@ -153,13 +156,26 @@ def replace_cat(df:pd.DataFrame, cat_dict:typing.List[str])->pd.DataFrame:
     for col, values in cat_dict.items():
         for old, new in values.items():
             df[col] = df[col].apply(lambda x: x.replace(old, new))
-        logger.debug("The values in column %s was changed to "
-                     "binary categories that match future user input", col)
+        logger.debug(
+            "The values in column %s was changed to "
+            "binary categories that match future user input",
+            col,
+        )
 
     return df
 
-def clean_target(df:pd.DataFrame,convert_dict:typing.Dict[str,str], convert_col: str,key: str,val1: str,val2: str,val3: str,new_col: str)->pd.DataFrame:
-    '''Generating the target variable from credit records.
+
+def clean_target(
+    df: pd.DataFrame,
+    convert_dict: typing.Dict[str, str],
+    convert_col: str,
+    key: str,
+    val1: str,
+    val2: str,
+    val3: str,
+    new_col: str,
+) -> pd.DataFrame:
+    """Generating the target variable from credit records.
     Args:
         df (:obj:`DataFrame <pandas.DataFrame>`): DataFrame with original records.
         convert_dict (dict): Dictionary containing information on transforming credit records.
@@ -169,22 +185,30 @@ def clean_target(df:pd.DataFrame,convert_dict:typing.Dict[str,str], convert_col:
     Returns:
         df (:obj:`DataFrame <pandas.DataFrame>`): DataFrame with newly created target variable.
 
-    '''
+    """
     df.replace({convert_col: convert_dict}, inplace=True)
-    df=df.value_counts(subset=[key, convert_col]).unstack(fill_value=0)
+    df = df.value_counts(subset=[key, convert_col]).unstack(fill_value=0)
     df.loc[(df[val1] > df[val2]), new_col] = 1
     df.loc[(df[val1] > df[val3]), new_col] = 1
     df.loc[(df[val2] > df[val1]), new_col] = 0
     df.loc[(df[val2] > df[val3]), new_col] = 1
     df.loc[(df[val3] > df[val1]), new_col] = 0
     df.loc[(df[val3] > df[val2]), new_col] = 0
-    df[new_col] = df[new_col].astype('int')
+    df[new_col] = df[new_col].astype("int")
     df.drop([val1, val2, val3], axis=1, inplace=True)
     return df
 
 
-
-def clean(df: pd.DataFrame, filna_col: str, clean_col: str, clean_replace_dict: typing.Dict[str,str], to_str_list: typing.List[str], neg_cols: typing.List[str], cat_dict: typing.Dict[str,str], filna_dict: typing.Dict[str,str])->pd.DataFrame:
+def clean(
+    df: pd.DataFrame,
+    filna_col: str,
+    clean_col: str,
+    clean_replace_dict: typing.Dict[str, str],
+    to_str_list: typing.List[str],
+    neg_cols: typing.List[str],
+    cat_dict: typing.Dict[str, str],
+    filna_dict: typing.Dict[str, str],
+) -> pd.DataFrame:
     """Clean the input DataFrame to be ready to generate new features from
 
     Args:
@@ -216,30 +240,28 @@ def clean(df: pd.DataFrame, filna_col: str, clean_col: str, clean_replace_dict: 
     df_clean = clean_column(df_nona, clean_col, clean_replace_dict)
     df_out = neg_to_pos(df_clean, neg_cols)
     for col in to_str_list:
-        df_out=to_str(df_out, col)
+        df_out = to_str(df_out, col)
     df_out = replace_cat(df_out, cat_dict)
     for col in to_str_list:
-        df_out=to_str(df_out, col)
-
+        df_out = to_str(df_out, col)
 
     if sum(df_out.isna().sum()) != 0:
-        logger.warning('There are still missing values in the cleaned DataFrame')
+        logger.warning("There are still missing values in the cleaned DataFrame")
     else:
-        logger.info('There are no missing values after the cleaning steps')
+        logger.info("There are no missing values after the cleaning steps")
 
     return df_out
 
-def get_full_df(df1:pd.DataFrame,df2:pd.DataFrame,key:str)->pd.DataFrame:
-    '''Merging the two dataframe into final cleaned Dataframe
+
+def get_full_df(df1: pd.DataFrame, df2: pd.DataFrame, key: str) -> pd.DataFrame:
+    """Merging the two dataframe into final cleaned Dataframe
     Args:
         df1 (:obj:`DataFrame <pandas.DataFrame>`): DataFrame with original records.
         df2 (:obj:`DataFrame <pandas.DataFrame>`): DataFrame with original records.
         key (str): Column that we join the two DataFrames by.
     Returns:
         df_out (:obj:`DataFrame <pandas.DataFrame>`):
-    '''
+    """
 
-    df_out = df1.merge(df2, how='inner', on=[key])
+    df_out = df1.merge(df2, how="inner", on=[key])
     return df_out
-
-

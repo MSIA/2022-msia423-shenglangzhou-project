@@ -258,7 +258,7 @@ def test_replace_cat():
     df_in_index = [64282, 94645, 306349, 258314, 87597, 27731, 284391, 267734,
                    238789, 299374, 188398, 252746, 249037, 294226, 91317, 219832,
                    70781, 1710, 195776, 143511]
-    df_in_columns = ['own_car', 'own_realty', 'phone_contactable', 'gender']
+    df_in_columns = ['FLAG_OWN_CAR', 'FLAG_OWN_REALTY', 'FLAG_MOBIL', 'CODE_GENDER']
 
     df_in = pd.DataFrame(df_in_values, index=df_in_index, columns=df_in_columns)
 
@@ -287,7 +287,7 @@ def test_replace_cat():
         index=[64282, 94645, 306349, 258314, 87597, 27731, 284391, 267734,
                238789, 299374, 188398, 252746, 249037, 294226, 91317, 219832,
                70781, 1710, 195776, 143511],
-        columns=['own_car', 'own_realty', 'phone_contactable', 'gender'])
+        columns=['FLAG_OWN_CAR', 'FLAG_OWN_REALTY', 'FLAG_MOBIL', 'CODE_GENDER'])
 
     # Compute test output
     cat_dict = {'FLAG_OWN_CAR': {"Y": "Yes", "N": "No"},

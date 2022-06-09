@@ -4,15 +4,16 @@ the functionality to interact with S3
 """
 import logging
 import re
+import typing
 
 import boto3
 import botocore
-import typing
+
 
 logger = logging.getLogger(__name__)
 
 
-def parse_s3(s3_path:str):
+def parse_s3(s3_path: str) -> typing.Tuple[str]:
     """parse the S3 path to return bucket name and the S3 path
 
     Args:
@@ -32,7 +33,7 @@ def parse_s3(s3_path:str):
     return s3bucket, s3_path
 
 
-def upload_file_to_s3(local_path:str, s3_path:str)->None:
+def upload_file_to_s3(local_path: str, s3_path: str) -> None:
     """Upload the file from the local path to s3
 
     Args:
@@ -51,13 +52,15 @@ def upload_file_to_s3(local_path:str, s3_path:str)->None:
     try:
         bucket.upload_file(local_path, s3_just_path)
     except botocore.exceptions.NoCredentialsError:
-        logger.error("Please provide AWS credentials via AWS_ACCESS_KEY_ID "
-                     "and AWS_SECRET_ACCESS_KEY env variables.")
+        logger.error(
+            "Please provide AWS credentials via AWS_ACCESS_KEY_ID "
+            "and AWS_SECRET_ACCESS_KEY env variables."
+        )
     else:
         logger.info("Data uploaded from %s to %s", local_path, s3_path)
 
 
-def download_file_from_s3(local_path:str, s3_path:str)->None:
+def download_file_from_s3(local_path: str, s3_path: str) -> None:
     """Download the file from s3 to the local path
 
     Args:
@@ -76,7 +79,9 @@ def download_file_from_s3(local_path:str, s3_path:str)->None:
     try:
         bucket.download_file(s3_just_path, local_path)
     except botocore.exceptions.NoCredentialsError:
-        logger.error("Please provide AWS credentials via AWS_ACCESS_KEY_ID "
-                     "and AWS_SECRET_ACCESS_KEY env variables.")
+        logger.error(
+            "Please provide AWS credentials via AWS_ACCESS_KEY_ID "
+            "and AWS_SECRET_ACCESS_KEY env variables."
+        )
     else:
         logger.info("Data downloaded from %s to %s", s3_path, local_path)
