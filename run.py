@@ -17,7 +17,9 @@ from src.add_application import ApplicationManager, create_db
 from src.s3 import upload_file_to_s3, download_file_from_s3
 from src.acquire import import_application_data, clean, import_credit_data, clean_target, get_full_df
 from src.features import featurize, get_ohe_data, get_user_df
-from src.model import train_model, evaluate
+from src.model import train_model
+from src.score_model import compute_score
+from src.evaluate import load_pred, load_test, compute_metrics
 from config.flaskconfig import SQLALCHEMY_DATABASE_URI
 
 logging.config.fileConfig(pkg_resources.resource_filename(__name__, 'config/logging/local.conf'),
@@ -33,23 +35,34 @@ if __name__ == '__main__':
 
     # Sub-parser for creating a database
     sb_create = subparsers.add_parser('create_db', description='Create database')
-    sb_create.add_argument('--engine_string', default='mysql+pymysql://dylan:zz990915@nw-msia423-shenglang.c32qnaesjuwf.us-east-1.rds.amazonaws.com:3306/msia423_db',
+    sb_create.add_argument('--engine_string', default=SQLALCHEMY_DATABASE_URI,
                            help='SQLAlchemy connection URI for database')
 
     # Sub-parser for uploading data to s3
     sb_upload = subparsers.add_parser('upload_file_to_s3', help='Upload raw data to s3')
-    sb_upload.add_argument('--s3_path',
-                           default='s3://2021-msia423-shen-binqi/raw/application_data.csv',
+    sb_upload.add_argument('--s3_path1',
+                           default='s3://2022-msia423-shenglang-zhou/raw/application_record.csv',
                            help='S3 data path to the data')
-    sb_upload.add_argument('--local_path', default='data/sample/application_data.csv',
+    sb_upload.add_argument('--local_path1', default='data/sample/application_record.csv',
+                           help='local path to the data')
+    sb_upload.add_argument('--s3_path2',
+                           default='s3://2022-msia423-shenglang-zhou/raw/credit_record.csv',
+                           help='S3 data path to the data')
+    sb_upload.add_argument('--local_path2', default='data/sample/credit_record.csv',
                            help='local path to the data')
 
     # Sub-parser for downloading data from s3
-    sb_upload = subparsers.add_parser('download_file_from_s3', help='Download raw data from s3')
-    sb_upload.add_argument('--s3_path',
-                           default='s3://2021-msia423-shen-binqi/raw/application_data.csv',
+    sb_download = subparsers.add_parser('download_file_from_s3', help='Download raw data from s3')
+    sb_download.add_argument('--s3_path1',
+                           default='s3://2022-msia423-shenglang-zhou/raw/application_record.csv',
                            help='S3 data path to the data')
-    sb_upload.add_argument('--local_path', default='data/sample/application_data.csv',
+    sb_download.add_argument('--local_path1', 
+                            default='data/sample/application_record.csv',
+                            help='local path to the data')
+    sb_download.add_argument('--s3_path2',
+                           default='s3://2022-msia423-shenglang-zhou/raw/credit_record.csv',
+                           help='S3 data path to the data')
+    sb_download.add_argument('--local_path2', default='data/sample/credit_record.csv',
                            help='local path to the data')
 
     # Sub-parser for ingesting new data
@@ -64,7 +77,7 @@ if __name__ == '__main__':
                                         description='Acquire data, clean data, '
                                                     'featurize data, and run model-pipeline')
     sb_pipeline.add_argument('--step', help='Which step to run',
-                             choices=['clean', 'featurize', 'model', 'test'])
+                             choices=['clean', 'featurize', 'model','score', 'evaluate'])
     sb_pipeline.add_argument('--input', '-i', default=None,
                              help='Path to input data (optional, default = None)')
     sb_pipeline.add_argument('--config', default='config/config.yaml',
@@ -73,7 +86,11 @@ if __name__ == '__main__':
                              help='Path to save output (optional, default = None)')
     sb_pipeline.add_argument('--output2', '-o2', default='data/artifacts/ingest_data.csv',
                              help='Path to save output (optional, default = None)')
-
+    sb_pipeline.add_argument("--output_train", "-train", default="data/sample/train.csv", help="output file for train")
+    sb_pipeline.add_argument("--output_test", "-test", default="data/sample/test.csv", help="output file for test")
+    sb_pipeline.add_argument("--test", "-t", default= "data/sample/test.csv", help="path to the test file")
+    sb_pipeline.add_argument("--model", "-m", default="models/randomforest.joblib", help="path to the model")
+    sb_pipeline.add_argument("--prediction", "-p", default= "data/artifacts/evaluation_result.csv", help="path to the prediction file")
     args = parser.parse_args()
     sp_used = args.subparser_name
 
@@ -84,9 +101,11 @@ if __name__ == '__main__':
         am.add_application_df(args.input)
         am.close()
     elif sp_used == 'upload_file_to_s3':
-        upload_file_to_s3(args.local_path, args.s3_path)
+        upload_file_to_s3(args.local_path1, args.s3_path1)
+        upload_file_to_s3(args.local_path2, args.s3_path2)
     elif sp_used == 'download_file_from_s3':
-        download_file_from_s3(args.local_path, args.s3_path)
+        download_file_from_s3(args.local_path1, args.s3_path1)
+        download_file_from_s3(args.local_path2, args.s3_path2)
     elif sp_used == 'run_model_pipeline':
         # load yaml configuration file
         try:
@@ -118,21 +137,59 @@ if __name__ == '__main__':
                 logger.info('Output saved to %s', args.output2)
         elif args.step == 'model':
             # train model & evaluate results
-            model_result = train_model(input, **conf['model']['train_model'])
-            output = model_result[0]
-            X_test = model_result[1]
-            y_test = model_result[2]
+            output, y_test, y_train,X_test,X_train = train_model(input, **conf['model']['train_model'])
+            
+            train = pd.concat([X_train, y_train], axis=1)
+            test = pd.concat([X_test, y_test], axis=1)
+            train.to_csv(args.output_train, index=False)
+            test.to_csv(args.output_test, index=False)
+            
+        elif args.step == 'score':
+            test = pd.read_csv(args.test)
+            loaded_rf = joblib.load(args.model)
             # evaluate the model result
-            evaluate(output, X_test, y_test, **conf['model']['evaluate'])
-        elif args.step == 'test':
-            os.system('pytest')
+            output=compute_score(loaded_rf, test, **conf['score_model']['compute_score'])
+
+        elif args.step == 'evaluate':
+            
+            
+       
+            param_py = conf['evaluate']
+
+            # do the prediction and save to file
+            test = pd.read_csv(args.test)
+            prediction = pd.read_csv(args.prediction)
+
+            y_test = load_test(args.test, **param_py["load_test"])
+            proba, binary = load_pred(args.prediction, **param_py["load_pred"])
+
+            result = compute_metrics(y_test, proba, binary, **param_py["compute_metrics"])
+        
+            with open(args.output, "w") as file:
+                if "auc" in result:
+                    file.write('AUC on test: %0.3f \n\n' % result["auc"])
+                if "accuracy" in result:
+                    file.write('Accuracy on test: %0.3f\n\n' % result["accuracy"])
+                if "confusion" in result:
+                    file.write('Confusion matrix:\n')
+                    file.write(pd.DataFrame(result["confusion"],
+                            index=['Actual negative','Actual positive'],
+                            columns=['Predicted negative', 'Predicted positive']).to_string())
+                    file.write('\n\n')
+                if "classification_report" in result:
+                    file.write('classification_report:\n')
+                    file.write(result["classification_report"])
+
+       
+
+    
 
         if args.output is not None:
-            if args.step != 'model':
+            if args.step != 'model' and args.step != 'evaluate':
                 # save intermediate artifacts in the model pipeline
                 output.to_csv(args.output, index=False)
                 logger.info('Output saved to %s', args.output)
-            else:
+            elif args.step == 'model':
                 # save the trained model
                 joblib.dump(output, args.output)
                 logger.info('Trained model object saved to %s', args.output)
